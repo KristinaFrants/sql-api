@@ -52,22 +52,29 @@ def handle_users():
 
     return "Invalid Method", 404
 
-@app.route('/userstwo/<int:person_id>', methods=['PUT'])
+@app.route('/userstwo/<int:person_id>', methods=['PUT', 'DELETE'])
 def handle_update(person_id):
-
     body = request.get_json()
     user1 = Person.query.get(person_id)
+    if request.method == 'PUT':
+       
 
-    if user1 is None:
-        raise APIException('User not found', status_code=404)
-    if "username" in body:
-        user1.username = body["username"]
-    if "email" in body:
-        user1.email = body["email"]
+        if user1 is None:
+            raise APIException('User not found', status_code=404)
+        if "username" in body:
+            user1.username = body["username"]
+        if "email" in body:
+            user1.email = body["email"]
 
-    db.session.commit()
-    return "ok", 200
+        db.session.commit()
+        return "ok", 200
+    if request.method == 'DELETE':
+       
+        db.session.delete(user1)
+        db.session.commit()
+        return jsonify(user1.serialize()), 200
 
+    return "Invalid Method", 404
 
 
 @app.route('/hello', methods=['POST', 'GET'])
